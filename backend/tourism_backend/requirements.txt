@@ -1,0 +1,8 @@
+django>=5.0
+djangorestframework
+django-cors-headers
+django-filter
+psycopg2-binary  # Драйвер для PostgreSQL
+pillow           # Для работы с изображениями
+djangorestframework-simplejwt  # Для JWT авторизации
+pip install python-dotenv
