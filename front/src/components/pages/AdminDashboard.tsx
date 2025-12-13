@@ -127,6 +127,16 @@ export function AdminDashboard({ onNavigate }: AdminDashboardProps) {
               <p className="text-sm text-gray-600">Approve or deny user reviews</p>
             </CardContent>
           </Card>
+          <Card 
+            className="cursor-pointer hover:shadow-lg transition-shadow"
+            onClick={() => onNavigate('admin-routes')}
+          >
+            <CardContent className="pt-6 text-center">
+              <MapPin className="w-12 h-12 mx-auto mb-3 text-[#0A4B78]" />
+              <h3 className="mb-2">Manage Routes</h3>
+              <p className="text-sm text-gray-600">Create tours and add stops</p>
+            </CardContent>
+          </Card>
         </div>
       </main>
     </div>

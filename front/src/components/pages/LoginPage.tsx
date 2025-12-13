@@ -5,12 +5,14 @@ import { Label } from "../ui/label";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "../ui/card";
 import { useState } from "react";
 import axios from "axios";
+import { useTranslation } from 'react-i18next'; // 1. Импорт
 
 interface LoginPageProps {
   onNavigate: (page: string) => void;
 }
 
 export function LoginPage({ onNavigate }: LoginPageProps) {
+  const { t } = useTranslation(); // 2. Инициализация
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -21,23 +23,19 @@ export function LoginPage({ onNavigate }: LoginPageProps) {
     setError("");
     
     try {
-      // Отправляем запрос на получение токена
       const response = await axios.post('http://localhost:8000/api/auth/token/', {
         username,
         password
       });
 
-      // Сохраняем токены (в реальном приложении лучше использовать httpOnly cookies или более безопасные методы)
       localStorage.setItem('access_token', response.data.access);
       localStorage.setItem('refresh_token', response.data.refresh);
       
-      // Проверяем, является ли пользователь админом (опционально, нужен доп. запрос к /profile/me)
-      // Для простоты сразу переходим на главную
       onNavigate('home-user');
       
     } catch (err) {
       console.error("Login error:", err);
-      setError("Invalid username or password");
+      setError(t('login_error_msg')); // Перевод ошибки
     } finally {
       setIsLoading(false);
     }
@@ -51,9 +49,9 @@ export function LoginPage({ onNavigate }: LoginPageProps) {
         <div className="max-w-md mx-auto">
           <Card>
             <CardHeader className="space-y-1">
-              <CardTitle>Welcome Back</CardTitle>
+              <CardTitle>{t('welcome_back_title')}</CardTitle>
               <CardDescription>
-                Sign in to your account to continue exploring Kazakhstan
+                {t('login_desc')}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -63,22 +61,22 @@ export function LoginPage({ onNavigate }: LoginPageProps) {
                 </div>
               )}
               <div className="space-y-2">
-                <Label htmlFor="username">Username</Label>
+                <Label htmlFor="username">{t('username_label')}</Label>
                 <Input 
                   id="username" 
                   type="text" 
-                  placeholder="Enter your username"
+                  placeholder={t('username_placeholder')}
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
                 />
               </div>
               
               <div className="space-y-2">
-                <Label htmlFor="password">Password</Label>
+                <Label htmlFor="password">{t('password_label')}</Label>
                 <Input 
                   id="password" 
                   type="password" 
-                  placeholder="Enter your password"
+                  placeholder={t('password_placeholder')}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                 />
@@ -90,15 +88,15 @@ export function LoginPage({ onNavigate }: LoginPageProps) {
                 onClick={handleLogin}
                 disabled={isLoading}
               >
-                {isLoading ? "Signing In..." : "Sign In"}
+                {isLoading ? t('signing_in_loading') : t('sign_in_button')}
               </Button>
               <p className="text-sm text-gray-600 text-center">
-                Don't have an account?{' '}
+                {t('no_account_text')}{' '}
                 <button 
                   onClick={() => onNavigate('register')}
                   className="text-[#0A4B78] hover:underline"
                 >
-                  Sign up
+                  {t('signup')}
                 </button>
               </p>
             </CardFooter>

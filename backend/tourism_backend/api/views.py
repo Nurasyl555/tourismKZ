@@ -10,8 +10,10 @@ from .models import Attraction, Review, Route, Category, Region, UserProfile
 from .serializers import (
     AttractionSerializer, ReviewSerializer, RouteSerializer,
     CategorySerializer, RegionSerializer, UserProfileSerializer,
-    RegisterSerializer
+    RegisterSerializer, BookingSerializer
 )
+from .models import Booking
+from .serializers import BookingSerializer
 
 class IsAdminOrReadOnly(permissions.BasePermission):
     def has_permission(self, request, view):
@@ -144,6 +146,16 @@ class UserProfileViewSet(viewsets.ModelViewSet): # Было ReadOnlyModelViewSet
             data['favorites'] = AttractionSerializer(favorites, many=True).data
             return Response(data)
         
+            try:
+                bookings = request.user.bookings.all().order_by('-created_at')
+                data['bookings'] = BookingSerializer(bookings, many=True).data
+            except AttributeError:
+                # Если вы забыли добавить related_name='bookings' в models.py, сработает booking_set
+                bookings = request.user.booking_set.all().order_by('-created_at')
+                data['bookings'] = BookingSerializer(bookings, many=True).data
+
+            return Response(data)
+        
         elif request.method in ['PATCH', 'PUT']:
             # Обновляем данные (partial=True разрешает обновить только одно поле, например bio)
             serializer = self.get_serializer(profile, data=request.data, partial=True)
@@ -168,3 +180,36 @@ class AdminStatsView(APIView):
             'total_page_views': 89342,
             'popular_destinations': Attraction.objects.order_by('-visitors_count')[:5].values('name', 'visitors_count')
         })
+    
+# booking
+
+
+class BookingViewSet(viewsets.ModelViewSet):
+    serializer_class = BookingSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        # Пользователь видит только свои брони
+        return Booking.objects.filter(user=self.request.user)
+
+    def perform_create(self, serializer):
+        # Автоматически считаем цену и привязываем юзера
+        route = serializer.validated_data['route']
+        people = serializer.validated_data.get('people_count', 1)
+        
+        # Предполагаем, что цена записана в budget_range как "$200-300". 
+        # Для реальной оплаты в модели Route нужно отдельное поле price (Decimal).
+        # Пока возьмем заглушку: 100$ за человека
+        price_per_person = 100 
+        total = price_per_person * people
+        
+        serializer.save(user=self.request.user, total_price=total, status='pending')
+
+    @action(detail=True, methods=['post'])
+    def pay(self, request, pk=None):
+        booking = self.get_object()
+        # ЗДЕСЬ ПОДКЛЮЧАЕТСЯ STRIPE / KASPI / EPAY
+        # Пока просто меняем статус
+        booking.status = 'paid'
+        booking.save()
+        return Response({'status': 'payment successful', 'booking_status': 'paid'})

@@ -2,15 +2,18 @@ import { Header } from "../Header";
 import { ImageWithFallback } from "../figma/ImageWithFallback";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { Lightbulb, Wallet, Map, MessageCircle, Calendar, Shield } from "lucide-react";
+import { useTranslation } from 'react-i18next'; // 1. Импорт
 
 interface TravelersTipsProps {
   onNavigate: (page: string) => void;
 }
 
 export function TravelersTips({ onNavigate }: TravelersTipsProps) {
+  const { t } = useTranslation(); // 2. Инициализация
+
   return (
     <div className="min-h-screen bg-gray-50">
-      <Header isLoggedIn onNavigate={onNavigate} />
+      <Header isLoggedIn={true} onNavigate={onNavigate} />
       
       <main>
         {/* Hero Section */}
@@ -23,8 +26,8 @@ export function TravelersTips({ onNavigate }: TravelersTipsProps) {
           <div className="absolute inset-0 bg-black/40" />
           
           <div className="relative z-10 text-center text-white max-w-4xl px-4">
-            <h1 className="mb-4 text-white">Traveler's Tips & Guides</h1>
-            <p className="text-xl text-white">Everything you need to know for a smooth journey in Kazakhstan</p>
+            <h1 className="mb-4 text-white">{t('tips_hero_title')}</h1>
+            <p className="text-xl text-white">{t('tips_hero_subtitle')}</p>
           </div>
         </div>
 
@@ -33,9 +36,7 @@ export function TravelersTips({ onNavigate }: TravelersTipsProps) {
             {/* Introduction */}
             <div className="bg-white p-8 rounded-lg shadow-md mb-8">
               <p className="text-gray-700 text-lg">
-                Kazakhstan is a vast and diverse country with unique customs, landscapes, and experiences. 
-                Whether you're an international visitor or a local explorer, these essential tips will help 
-                you make the most of your journey through this beautiful Central Asian nation.
+                {t('tips_intro_text')}
               </p>
             </div>
 
@@ -47,15 +48,15 @@ export function TravelersTips({ onNavigate }: TravelersTipsProps) {
                     <div className="w-12 h-12 rounded-full bg-[#E8F4F8] flex items-center justify-center">
                       <Wallet className="w-6 h-6 text-[#0A4B78]" />
                     </div>
-                    <CardTitle>Money & Budget</CardTitle>
+                    <CardTitle>{t('tips_money_title')}</CardTitle>
                   </div>
                 </CardHeader>
                 <CardContent>
                   <ul className="space-y-2 text-sm text-gray-700">
-                    <li>• Currency: Kazakhstan Tenge (KZT)</li>
-                    <li>• Cards accepted in cities, cash needed in rural areas</li>
-                    <li>• Daily budget: $30-50 (budget), $80-150 (comfort)</li>
-                    <li>• ATMs widely available in major cities</li>
+                    <li>• {t('tips_money_currency')}</li>
+                    <li>• {t('tips_money_cards')}</li>
+                    <li>• {t('tips_money_budget')}</li>
+                    <li>• {t('tips_money_atms')}</li>
                   </ul>
                 </CardContent>
               </Card>
@@ -66,15 +67,15 @@ export function TravelersTips({ onNavigate }: TravelersTipsProps) {
                     <div className="w-12 h-12 rounded-full bg-[#E8F4F8] flex items-center justify-center">
                       <MessageCircle className="w-6 h-6 text-[#0A4B78]" />
                     </div>
-                    <CardTitle>Language</CardTitle>
+                    <CardTitle>{t('tips_lang_title')}</CardTitle>
                   </div>
                 </CardHeader>
                 <CardContent>
                   <ul className="space-y-2 text-sm text-gray-700">
-                    <li>• Official languages: Kazakh and Russian</li>
-                    <li>• English spoken in tourist areas and hotels</li>
-                    <li>• Learn basic Russian phrases for easier travel</li>
-                    <li>• Translation apps are very helpful</li>
+                    <li>• {t('tips_lang_official')}</li>
+                    <li>• {t('tips_lang_english')}</li>
+                    <li>• {t('tips_lang_russian')}</li>
+                    <li>• {t('tips_lang_apps')}</li>
                   </ul>
                 </CardContent>
               </Card>
@@ -85,15 +86,15 @@ export function TravelersTips({ onNavigate }: TravelersTipsProps) {
                     <div className="w-12 h-12 rounded-full bg-[#E8F4F8] flex items-center justify-center">
                       <Calendar className="w-6 h-6 text-[#0A4B78]" />
                     </div>
-                    <CardTitle>Best Time to Visit</CardTitle>
+                    <CardTitle>{t('tips_time_title')}</CardTitle>
                   </div>
                 </CardHeader>
                 <CardContent>
                   <ul className="space-y-2 text-sm text-gray-700">
-                    <li>• Spring (Apr-May): Mild weather, blooming landscapes</li>
-                    <li>• Summer (Jun-Aug): Peak season, warm temperatures</li>
-                    <li>• Fall (Sep-Oct): Beautiful autumn colors, fewer crowds</li>
-                    <li>• Winter (Nov-Mar): Excellent for skiing and winter sports</li>
+                    <li>• {t('tips_time_spring')}</li>
+                    <li>• {t('tips_time_summer')}</li>
+                    <li>• {t('tips_time_fall')}</li>
+                    <li>• {t('tips_time_winter')}</li>
                   </ul>
                 </CardContent>
               </Card>
@@ -104,15 +105,15 @@ export function TravelersTips({ onNavigate }: TravelersTipsProps) {
                     <div className="w-12 h-12 rounded-full bg-[#E8F4F8] flex items-center justify-center">
                       <Map className="w-6 h-6 text-[#0A4B78]" />
                     </div>
-                    <CardTitle>Transportation</CardTitle>
+                    <CardTitle>{t('tips_transport_title')}</CardTitle>
                   </div>
                 </CardHeader>
                 <CardContent>
                   <ul className="space-y-2 text-sm text-gray-700">
-                    <li>• Domestic flights connect major cities</li>
-                    <li>• Trains are comfortable and affordable</li>
-                    <li>• Rental cars available in cities (international license needed)</li>
-                    <li>• Taxis and ride-sharing apps in urban areas</li>
+                    <li>• {t('tips_transport_flights')}</li>
+                    <li>• {t('tips_transport_trains')}</li>
+                    <li>• {t('tips_transport_cars')}</li>
+                    <li>• {t('tips_transport_taxi')}</li>
                   </ul>
                 </CardContent>
               </Card>
@@ -123,20 +124,19 @@ export function TravelersTips({ onNavigate }: TravelersTipsProps) {
               <div className="bg-white p-8 rounded-lg shadow-md">
                 <div className="flex items-center gap-3 mb-4">
                   <Shield className="w-8 h-8 text-[#0A4B78]" />
-                  <h2>Safety & Health</h2>
+                  <h2>{t('tips_safety_title')}</h2>
                 </div>
                 <div className="space-y-3 text-gray-700">
                   <p>
-                    Kazakhstan is generally a safe country for travelers. Crime rates are relatively low, 
-                    but exercise normal precautions as you would in any country:
+                    {t('tips_safety_intro')}
                   </p>
                   <ul className="space-y-2 ml-4">
-                    <li>• Keep valuables secure and be aware of your surroundings in crowded areas</li>
-                    <li>• Drink bottled water, especially outside major cities</li>
-                    <li>• Bring any prescription medications with you</li>
-                    <li>• Medical facilities are good in cities but limited in rural areas</li>
-                    <li>• Travel insurance is highly recommended</li>
-                    <li>• Emergency number: 112</li>
+                    <li>• {t('tips_safety_1')}</li>
+                    <li>• {t('tips_safety_2')}</li>
+                    <li>• {t('tips_safety_3')}</li>
+                    <li>• {t('tips_safety_4')}</li>
+                    <li>• {t('tips_safety_5')}</li>
+                    <li>• {t('tips_safety_6')}</li>
                   </ul>
                 </div>
               </div>
@@ -144,74 +144,71 @@ export function TravelersTips({ onNavigate }: TravelersTipsProps) {
               <div className="bg-white p-8 rounded-lg shadow-md">
                 <div className="flex items-center gap-3 mb-4">
                   <Lightbulb className="w-8 h-8 text-[#0A4B78]" />
-                  <h2>Cultural Etiquette</h2>
+                  <h2>{t('tips_culture_title')}</h2>
                 </div>
                 <div className="space-y-3 text-gray-700">
                   <p>
-                    Kazakhs are known for their warm hospitality. Respect local customs to enhance your experience:
+                    {t('tips_culture_intro')}
                   </p>
                   <ul className="space-y-2 ml-4">
-                    <li>• Remove shoes when entering someone's home</li>
-                    <li>• Accept tea when offered - it's a sign of hospitality</li>
-                    <li>• Dress modestly, especially when visiting religious sites</li>
-                    <li>• Always ask permission before photographing people</li>
-                    <li>• Handshakes are common, but wait for women to extend their hand first</li>
-                    <li>• Tipping is appreciated but not mandatory (10% in restaurants)</li>
+                    <li>• {t('tips_culture_1')}</li>
+                    <li>• {t('tips_culture_2')}</li>
+                    <li>• {t('tips_culture_3')}</li>
+                    <li>• {t('tips_culture_4')}</li>
+                    <li>• {t('tips_culture_5')}</li>
+                    <li>• {t('tips_culture_6')}</li>
                   </ul>
                 </div>
               </div>
 
               <div className="bg-white p-8 rounded-lg shadow-md">
-                <h2 className="mb-4">Visa Requirements</h2>
+                <h2 className="mb-4">{t('tips_visa_title')}</h2>
                 <div className="space-y-3 text-gray-700">
                   <p>
-                    Many nationalities can visit Kazakhstan visa-free for up to 30 days. This includes:
+                    {t('tips_visa_intro')}
                   </p>
                   <ul className="space-y-2 ml-4">
-                    <li>• EU countries</li>
-                    <li>• USA, Canada, UK</li>
-                    <li>• Australia, New Zealand</li>
-                    <li>• Many Asian and Latin American countries</li>
+                    <li>• {t('tips_visa_eu')}</li>
+                    <li>• {t('tips_visa_us_uk')}</li>
+                    <li>• {t('tips_visa_au_nz')}</li>
+                    <li>• {t('tips_visa_asia')}</li>
                   </ul>
                   <p className="mt-3">
-                    Always check the latest visa requirements for your nationality before traveling. 
-                    Your passport should be valid for at least 6 months beyond your planned departure date.
+                    {t('tips_visa_footer')}
                   </p>
                 </div>
               </div>
 
               <div className="bg-white p-8 rounded-lg shadow-md">
-                <h2 className="mb-4">What to Pack</h2>
+                <h2 className="mb-4">{t('tips_pack_title')}</h2>
                 <div className="grid md:grid-cols-2 gap-6 text-gray-700">
                   <div>
-                    <h3 className="text-[#0A4B78] mb-3">Essentials</h3>
+                    <h3 className="text-[#0A4B78] mb-3">{t('tips_pack_essentials_title')}</h3>
                     <ul className="space-y-2 text-sm">
-                      <li>• Comfortable walking shoes</li>
-                      <li>• Weather-appropriate clothing (layers recommended)</li>
-                      <li>• Sun protection (hat, sunglasses, sunscreen)</li>
-                      <li>• Power adapter (220V, European plugs)</li>
-                      <li>• Reusable water bottle</li>
+                      <li>• {t('tips_pack_essentials_1')}</li>
+                      <li>• {t('tips_pack_essentials_2')}</li>
+                      <li>• {t('tips_pack_essentials_3')}</li>
+                      <li>• {t('tips_pack_essentials_4')}</li>
+                      <li>• {t('tips_pack_essentials_5')}</li>
                     </ul>
                   </div>
                   <div>
-                    <h3 className="text-[#0A4B78] mb-3">For Outdoor Adventures</h3>
+                    <h3 className="text-[#0A4B78] mb-3">{t('tips_pack_outdoor_title')}</h3>
                     <ul className="space-y-2 text-sm">
-                      <li>• Hiking boots</li>
-                      <li>• Backpack</li>
-                      <li>• Warm jacket (even in summer for mountains)</li>
-                      <li>• First aid kit</li>
-                      <li>• Headlamp/flashlight</li>
+                      <li>• {t('tips_pack_outdoor_1')}</li>
+                      <li>• {t('tips_pack_outdoor_2')}</li>
+                      <li>• {t('tips_pack_outdoor_3')}</li>
+                      <li>• {t('tips_pack_outdoor_4')}</li>
+                      <li>• {t('tips_pack_outdoor_5')}</li>
                     </ul>
                   </div>
                 </div>
               </div>
 
               <div className="bg-[#E8F4F8] p-8 rounded-lg">
-                <h3 className="mb-3">Pro Tip: Stay Connected</h3>
+                <h3 className="mb-3">{t('tips_pro_title')}</h3>
                 <p className="text-gray-700">
-                  Purchase a local SIM card at the airport or in city centers for affordable data and calls. 
-                  Major providers include Kcell, Beeline, and Tele2. Coverage is excellent in cities and 
-                  along major routes, but can be limited in remote areas.
+                  {t('tips_pro_text')}
                 </p>
               </div>
             </div>

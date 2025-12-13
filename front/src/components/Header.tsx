@@ -8,6 +8,9 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
+// Импортируем хук перевода и наш переключатель
+import { useTranslation } from 'react-i18next';
+import { LanguageSwitcher } from "./LanguageSwitcher";
 
 interface HeaderProps {
   isLoggedIn?: boolean;
@@ -16,11 +19,11 @@ interface HeaderProps {
 }
 
 export function Header({ isLoggedIn = false, isAdmin = false, onNavigate }: HeaderProps) {
+  const { t } = useTranslation(); // Хук для использования переводов
   
   const handleLogout = () => {
     localStorage.removeItem('access_token');
     localStorage.removeItem('refresh_token');
-    // Перезагрузка страницы — самый простой способ сбросить состояние App.tsx
     window.location.reload(); 
   };
 
@@ -30,27 +33,33 @@ export function Header({ isLoggedIn = false, isAdmin = false, onNavigate }: Head
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2 cursor-pointer" onClick={() => onNavigate?.('home-guest')}>
             <Mountain className="w-8 h-8 text-[#0A4B78]" />
-            <span className="text-[#0A4B78] font-bold text-xl">Tourism Kazakhstan</span>
+            {/* Используем ключ перевода */}
+            <span className="text-[#0A4B78] font-bold text-xl hidden sm:block">
+              {t('app_title')}
+            </span>
           </div>
           
           <nav className="hidden md:flex items-center gap-6">
             <button onClick={() => onNavigate?.('home-user')} className="text-gray-700 hover:text-[#0A4B78]">
-              Destinations
+              {t('destinations')}
             </button>
             <button onClick={() => onNavigate?.('route-list')} className="text-gray-700 hover:text-[#0A4B78]">
-              Routes
+              {t('routes')}
             </button>
             <button onClick={() => onNavigate?.('travelers-tips')} className="text-gray-700 hover:text-[#0A4B78]">
-              Traveler's Tips
+              {t('tips')}
             </button>
             {isAdmin && (
               <button onClick={() => onNavigate?.('admin-dashboard')} className="text-[#0A4B78] font-medium">
-                Admin Dashboard
+                {t('admin_panel')}
               </button>
             )}
           </nav>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
+            {/* Вставляем переключатель языков */}
+            <LanguageSwitcher />
+
             {isLoggedIn ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -58,18 +67,16 @@ export function Header({ isLoggedIn = false, isAdmin = false, onNavigate }: Head
                     <User className="w-5 h-5" />
                   </Button>
                 </DropdownMenuTrigger>
-                {/* Добавлены классы bg-white и z-50 для правильного отображения */}
                 <DropdownMenuContent align="end" className="w-56 bg-white z-50 shadow-lg border border-gray-200">
                   <DropdownMenuLabel>My Account</DropdownMenuLabel>
                   <DropdownMenuSeparator />
                   
-                  {/* Добавлен cursor-pointer для реакции на наведение */}
                   <DropdownMenuItem 
                     className="cursor-pointer flex items-center" 
                     onClick={() => onNavigate?.('user-profile')}
                   >
                     <User className="w-4 h-4 mr-2" />
-                    <span>Profile</span>
+                    <span>{t('profile')}</span>
                   </DropdownMenuItem>
                   
                   <DropdownMenuItem 
@@ -77,7 +84,7 @@ export function Header({ isLoggedIn = false, isAdmin = false, onNavigate }: Head
                     onClick={() => onNavigate?.('user-profile')}
                   >
                     <Heart className="w-4 h-4 mr-2" />
-                    <span>My Favorites</span>
+                    <span>{t('favorites')}</span>
                   </DropdownMenuItem>
                   
                   <DropdownMenuSeparator />
@@ -87,26 +94,28 @@ export function Header({ isLoggedIn = false, isAdmin = false, onNavigate }: Head
                     className="text-red-600 cursor-pointer flex items-center"
                   >
                     <LogOut className="w-4 h-4 mr-2" />
-                    <span>Log out</span>
+                    <span>{t('logout')}</span>
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
             ) : (
-              <>
+              <div className="flex gap-2">
                 <Button 
                   variant="ghost"
                   onClick={() => onNavigate?.('login')}
+                  className="hidden sm:inline-flex"
                 >
-                  Login
+                  {t('login')}
                 </Button>
                 <Button 
                   className="bg-[#0A4B78] hover:bg-[#083A5E]"
                   onClick={() => onNavigate?.('register')}
                 >
-                  Sign Up
+                  {t('signup')}
                 </Button>
-              </>
+              </div>
             )}
+            {/* Мобильное меню (можно доработать позже) */}
             <Button variant="ghost" size="icon" className="md:hidden">
               <Menu className="w-5 h-5" />
             </Button>

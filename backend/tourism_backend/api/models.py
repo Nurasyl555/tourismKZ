@@ -33,7 +33,7 @@ class Attraction(models.Model):
     category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='attractions')
     description = models.TextField()
     # Изменено на URLField для работы скрипта populate_db
-    image = models.URLField(max_length=500, blank=True)
+    image = models.ImageField(upload_to='attractions/', null=True, blank=True)
     
     latitude = models.FloatField(null=True, blank=True)
     longitude = models.FloatField(null=True, blank=True)
@@ -99,3 +99,27 @@ class RouteStop(models.Model):
 
     class Meta:
         ordering = ['day_number']
+
+# ... в конце файла api/models.py
+
+class Booking(models.Model):
+    STATUS_CHOICES = (
+        ('pending', 'Pending Payment'),
+        ('paid', 'Paid'),
+        ('cancelled', 'Cancelled'),
+    )
+
+    # user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='booking', null=True, blank=True) 
+    # Примечание: Если один юзер может купить много туров, используйте ForeignKey вместо OneToOneField
+    # Лучше так:
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='bookings')
+    
+    route = models.ForeignKey(Route, on_delete=models.CASCADE, related_name='bookings')
+    date = models.DateField() # Дата начала тура
+    people_count = models.IntegerField(default=1)
+    total_price = models.DecimalField(max_digits=10, decimal_places=2)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.user.username} - {self.route.title} ({self.status})"

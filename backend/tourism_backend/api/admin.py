@@ -5,7 +5,7 @@ from django.contrib import admin
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.contrib.auth.models import User
-from .models import UserProfile, Region, Category, Attraction, Review, Route, RouteStop
+from .models import UserProfile, Region, Category, Attraction, Review, Route, RouteStop, Booking
 
 # 1. Настройка Профиля Пользователя
 class UserProfileInline(admin.StackedInline):
@@ -61,3 +61,23 @@ class RouteAdmin(admin.ModelAdmin):
     list_filter = ('difficulty',)
     search_fields = ('title',)
     inlines = [RouteStopInline] # Остановки редактируются внутри страницы Маршрута
+
+@admin.register(Booking)
+class BookingAdmin(admin.ModelAdmin):
+    # Поля, которые видны в списке
+    list_display = ('id', 'user', 'route', 'date', 'people_count', 'total_price', 'status', 'created_at')
+    
+    # Поля, по которым можно кликнуть, чтобы открыть редактирование
+    list_display_links = ('id', 'user')
+    
+    # Фильтры справа (очень удобно для сортировки заказов)
+    list_filter = ('status', 'date', 'created_at')
+    
+    # Поле поиска (ищет по имени юзера и названию маршрута)
+    search_fields = ('user__username', 'user__email', 'route__title')
+    
+    # Поля только для чтения (чтобы случайно не изменить дату создания)
+    readonly_fields = ('created_at',)
+    
+    # Можно менять статус прямо из общего списка (опционально)
+    list_editable = ('status',)

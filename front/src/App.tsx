@@ -15,6 +15,7 @@ import { Button } from "./components/ui/button";
 import { Loader2 } from "lucide-react"; // Импорт иконки загрузки
 import axios from "axios";
 import { RouteList } from "./components/pages/RouteList";
+import { AdminManageRoutes } from "./components/pages/AdminManageRoutes";
 
 export type PageType = 
   | 'index'
@@ -29,6 +30,7 @@ export type PageType =
   | 'user-profile'
   | 'admin-dashboard'
   | 'admin-attractions'
+  | 'admin-routes'
   | 'admin-reviews'
   | 'mobile-views';
 
@@ -116,11 +118,13 @@ export default function App() {
       case 'attraction-details':
         return <AttractionDetails onNavigate={handleNavigate} attractionId={selectedAttractionId} />;
       case 'route-details':
-        return <RouteDetails onNavigate={handleNavigate} />;
+        return <RouteDetails onNavigate={handleNavigate} routeId={selectedAttractionId} />;
       case 'travelers-tips':
         return <TravelersTips onNavigate={handleNavigate} />;
       case 'user-profile':
         return <UserProfile onNavigate={handleNavigate} />;
+      case 'admin-routes':
+        return <AdminManageRoutes onNavigate={handleNavigate} />;
       case 'route-list':
         return <RouteList onNavigate={handleNavigate} isAdmin={isAdmin} />;
       

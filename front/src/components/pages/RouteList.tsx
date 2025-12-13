@@ -6,6 +6,7 @@ import { ImageWithFallback } from "../figma/ImageWithFallback";
 import { Clock, MapPin, DollarSign, Users, ArrowRight } from "lucide-react";
 import { useState, useEffect } from "react";
 import axios from "axios";
+import { useTranslation } from 'react-i18next'; // 1. Импорт
 
 interface RouteListProps {
   onNavigate: (page: string, id?: number) => void;
@@ -13,6 +14,7 @@ interface RouteListProps {
 }
 
 export function RouteList({ onNavigate, isAdmin }: RouteListProps) {
+  const { t } = useTranslation(); // 2. Инициализация
   const [routes, setRoutes] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -38,14 +40,14 @@ export function RouteList({ onNavigate, isAdmin }: RouteListProps) {
       
       <main className="container mx-auto px-4 py-12">
         <div className="mb-8 text-center">
-          <h1 className="text-3xl font-bold text-[#0A4B78] mb-2">Explore Our Routes</h1>
-          <p className="text-gray-600">Curated itineraries for every type of traveler</p>
+          <h1 className="text-3xl font-bold text-[#0A4B78] mb-2">{t('explore_routes_title')}</h1>
+          <p className="text-gray-600">{t('explore_routes_subtitle')}</p>
         </div>
 
         {loading ? (
-          <div className="text-center py-12">Loading routes...</div>
+          <div className="text-center py-12">{t('loading_routes')}</div>
         ) : routes.length === 0 ? (
-          <div className="text-center py-12 text-gray-500">No routes found available at the moment.</div>
+          <div className="text-center py-12 text-gray-500">{t('no_routes_available')}</div>
         ) : (
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {routes.map((route) => (
@@ -57,7 +59,7 @@ export function RouteList({ onNavigate, isAdmin }: RouteListProps) {
                     className="w-full h-full object-cover"
                   />
                   <Badge className="absolute top-2 right-2 bg-white/90 text-[#0A4B78] hover:bg-white">
-                    {route.duration_days} Days
+                    {route.duration_days} {t('days_unit')}
                   </Badge>
                 </div>
                 
@@ -73,7 +75,8 @@ export function RouteList({ onNavigate, isAdmin }: RouteListProps) {
                   <div className="grid grid-cols-2 gap-y-2 text-sm text-gray-700">
                     <div className="flex items-center gap-2">
                       <Clock className="w-4 h-4 text-[#2D5016]" />
-                      <span>{route.duration_days} Days</span>
+                      {/* days_unit мы добавили в прошлом шаге */}
+                      <span>{route.duration_days} {t('days_unit')}</span>
                     </div>
                     <div className="flex items-center gap-2">
                       <DollarSign className="w-4 h-4 text-[#2D5016]" />
@@ -85,7 +88,8 @@ export function RouteList({ onNavigate, isAdmin }: RouteListProps) {
                     </div>
                     <div className="flex items-center gap-2">
                       <MapPin className="w-4 h-4 text-[#2D5016]" />
-                      <span>~{route.distance_km} km</span>
+                      {/* km_unit мы добавили в прошлом шаге */}
+                      <span>~{route.distance_km} {t('km_unit')}</span>
                     </div>
                   </div>
                 </CardContent>
@@ -95,7 +99,7 @@ export function RouteList({ onNavigate, isAdmin }: RouteListProps) {
                     className="w-full bg-[#0A4B78] hover:bg-[#083A5E]"
                     onClick={() => onNavigate('route-details', route.id)}
                   >
-                    View Itinerary <ArrowRight className="ml-2 w-4 h-4" />
+                    {t('view_itinerary_btn')} <ArrowRight className="ml-2 w-4 h-4" />
                   </Button>
                 </CardFooter>
               </Card>

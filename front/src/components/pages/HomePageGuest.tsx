@@ -1,12 +1,15 @@
 import { Header } from "../Header";
 import { Button } from "../ui/button";
 import { ImageWithFallback } from "../figma/ImageWithFallback";
+import { useTranslation } from 'react-i18next'; // 1. Импорт хука
 
 interface HomePageGuestProps {
   onNavigate: (page: string) => void;
 }
 
 export function HomePageGuest({ onNavigate }: HomePageGuestProps) {
+  const { t } = useTranslation(); // 2. Инициализация
+
   return (
     <div className="min-h-screen bg-gray-50">
       <Header onNavigate={onNavigate} />
@@ -22,16 +25,17 @@ export function HomePageGuest({ onNavigate }: HomePageGuestProps) {
           <div className="absolute inset-0 bg-black/40" />
           
           <div className="relative z-10 text-center text-white max-w-4xl px-4">
-            <h1 className="mb-6 text-white">Discover the Heart of Central Asia</h1>
+            {/* Используем новые ключи для заголовков */}
+            <h1 className="mb-6 text-white">{t('guest_hero_title')}</h1>
             <p className="text-xl mb-8 text-white">
-              Explore Kazakhstan's breathtaking landscapes, rich culture, and unforgettable adventures
+              {t('guest_hero_subtitle')}
             </p>
             <Button 
               size="lg"
               className="bg-[#0A4B78] hover:bg-[#083A5E] px-8"
               onClick={() => onNavigate('login')}
             >
-              Start Your Journey
+              {t('start_journey')}
             </Button>
           </div>
         </div>
@@ -43,24 +47,24 @@ export function HomePageGuest({ onNavigate }: HomePageGuestProps) {
               <div className="w-16 h-16 bg-[#E8F4F8] rounded-full flex items-center justify-center mx-auto mb-4">
                 <span className="text-2xl">🏔️</span>
               </div>
-              <h3 className="mb-3">Natural Wonders</h3>
-              <p className="text-gray-600">From towering mountains to vast steppes, discover diverse landscapes</p>
+              <h3 className="mb-3">{t('feature_natural_wonders')}</h3>
+              <p className="text-gray-600">{t('feature_natural_desc')}</p>
             </div>
             
             <div className="bg-white p-8 rounded-lg shadow-md text-center">
               <div className="w-16 h-16 bg-[#E8F4F8] rounded-full flex items-center justify-center mx-auto mb-4">
                 <span className="text-2xl">🎯</span>
               </div>
-              <h3 className="mb-3">Curated Routes</h3>
-              <p className="text-gray-600">Expertly planned itineraries for every type of traveler</p>
+              <h3 className="mb-3">{t('feature_routes')}</h3>
+              <p className="text-gray-600">{t('feature_routes_desc')}</p>
             </div>
             
             <div className="bg-white p-8 rounded-lg shadow-md text-center">
               <div className="w-16 h-16 bg-[#E8F4F8] rounded-full flex items-center justify-center mx-auto mb-4">
                 <span className="text-2xl">💡</span>
               </div>
-              <h3 className="mb-3">Local Insights</h3>
-              <p className="text-gray-600">Get authentic tips from travelers and locals</p>
+              <h3 className="mb-3">{t('feature_insights')}</h3>
+              <p className="text-gray-600">{t('feature_insights_desc')}</p>
             </div>
           </div>
         </div>
