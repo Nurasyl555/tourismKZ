@@ -7,7 +7,7 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';
 import { ImageWithFallback } from "../figma/ImageWithFallback";
-
+import Snowfall from 'react-snowfall';
 interface HomePageUserProps {
   onNavigate: (page: string, id?: number) => void;
   isAdmin?: boolean;
@@ -98,7 +98,9 @@ export function HomePageUser({ onNavigate, isAdmin }: HomePageUserProps) {
   }, [searchTerm, selectedRegion, selectedCategory, sortBy]);
 
   return (
+    
     <div className="min-h-screen bg-gray-50">
+      <Snowfall color="#82C3D9" />
       <Header isLoggedIn={true} isAdmin={isAdmin} onNavigate={onNavigate} />
       
       <main>

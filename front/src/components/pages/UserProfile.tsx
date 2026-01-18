@@ -12,6 +12,16 @@ import { Heart, MapPin, Settings, Star, Save, X, Loader2, CreditCard, Calendar }
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { useTranslation } from 'react-i18next';
+import Snowfall  from "react-snowfall";
+interface Booking {
+  id: number;
+  route: number;          // ID маршрута (для ссылки)
+  route_title: string;    // Название (приходит с бэкенда)
+  date: string;           // Дата поездки
+  people_count: number;
+  total_price: string | number;
+  status: 'pending' | 'paid' | 'cancelled';
+}
 
 interface UserProfileProps {
   onNavigate: (page: string, id?: number) => void;
@@ -22,7 +32,7 @@ export function UserProfile({ onNavigate }: UserProfileProps) {
   const [profile, setProfile] = useState<any>(null);
   const [favorites, setFavorites] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [bookings, setBookings] = useState<any[]>([]);
+  const [bookings, setBookings] = useState<Booking[]>([]);
   const [isEditing, setIsEditing] = useState(false);
   const [saving, setSaving] = useState(false);
   const [editForm, setEditForm] = useState({
@@ -106,7 +116,7 @@ export function UserProfile({ onNavigate }: UserProfileProps) {
   return (
     <div className="min-h-screen bg-gray-50">
       <Header isLoggedIn onNavigate={onNavigate} />
-      
+      <Snowfall color="#82C3D9" />
       <main className="container mx-auto px-4 py-12">
         <div className="max-w-6xl mx-auto">
           {/* Profile Header */}

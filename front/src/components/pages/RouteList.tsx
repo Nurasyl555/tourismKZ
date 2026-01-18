@@ -7,7 +7,7 @@ import { Clock, MapPin, DollarSign, Users, ArrowRight } from "lucide-react";
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { useTranslation } from 'react-i18next'; // 1. Импорт
-
+import Snowfall  from "react-snowfall";
 interface RouteListProps {
   onNavigate: (page: string, id?: number) => void;
   isAdmin?: boolean;
@@ -36,6 +36,7 @@ export function RouteList({ onNavigate, isAdmin }: RouteListProps) {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      <Snowfall color="#82C3D9" />
       <Header isLoggedIn={isLoggedIn} isAdmin={isAdmin} onNavigate={onNavigate} />
       
       <main className="container mx-auto px-4 py-12">

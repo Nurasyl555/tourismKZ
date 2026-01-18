@@ -5,4 +5,5 @@ django-filter
 psycopg2-binary  # Драйвер для PostgreSQL
 pillow           # Для работы с изображениями
 djangorestframework-simplejwt  # Для JWT авторизации
+openai>=1.0.0
 pip install python-dotenv

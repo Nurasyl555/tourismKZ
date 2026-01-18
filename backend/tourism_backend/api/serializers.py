@@ -108,11 +108,22 @@ class RegisterSerializer(serializers.ModelSerializer):
 
 # Пример на бэкенде (Python/Django)
 class BookingSerializer(serializers.ModelSerializer):
-    # Добавляем поле, чтобы на фронте видеть название, а не только ID
+    # Берем название маршрута через связь route
     route_title = serializers.CharField(source='route.title', read_only=True)
-    
+    # Если нужно изображение, можно добавить так:
+    # route_image = serializers.CharField(source='route.image', read_only=True)
+
     class Meta:
         model = Booking
-        fields = ['id', 'route', 'route_title', 'date', 'people_count']
-        read_only_fields = ['user', 'status', 'total_price', 'created_at']
-        # status и total_price мы будем считать на бэкенде, чтобы нельзя было подделать
+        # ВАЖНО: 'route_title' обязательно должен быть в этом списке!
+        fields = [
+            'id', 
+            'route', 
+            'route_title', 
+            'date', 
+            'people_count', 
+            'total_price', 
+            'status', 
+            'created_at'
+        ]
+        read_only_fields = ['user', 'status', 'total_price', 'created_at', 'route_title']

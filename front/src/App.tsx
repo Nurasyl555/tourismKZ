@@ -16,6 +16,7 @@ import { Loader2 } from "lucide-react"; // Импорт иконки загру�
 import axios from "axios";
 import { RouteList } from "./components/pages/RouteList";
 import { AdminManageRoutes } from "./components/pages/AdminManageRoutes";
+import { AiPlanner } from "./components/pages/AiPlanner";
 
 export type PageType = 
   | 'index'
@@ -32,6 +33,7 @@ export type PageType =
   | 'admin-attractions'
   | 'admin-routes'
   | 'admin-reviews'
+  | 'ai-planner'
   | 'mobile-views';
 
 export default function App() {
@@ -127,6 +129,8 @@ export default function App() {
         return <AdminManageRoutes onNavigate={handleNavigate} />;
       case 'route-list':
         return <RouteList onNavigate={handleNavigate} isAdmin={isAdmin} />;
+      case 'ai-planner':
+        return <AiPlanner onNavigate={handleNavigate} isAdmin={isAdmin} />;
       
       // Админские страницы
       case 'admin-dashboard':

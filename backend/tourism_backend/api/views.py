@@ -12,8 +12,12 @@ from .serializers import (
     CategorySerializer, RegionSerializer, UserProfileSerializer,
     RegisterSerializer, BookingSerializer
 )
+import openai
+import os
+from django.conf import settings
 from .models import Booking
 from .serializers import BookingSerializer
+from django.db.models import Q 
 
 class IsAdminOrReadOnly(permissions.BasePermission):
     def has_permission(self, request, view):
@@ -141,23 +145,20 @@ class UserProfileViewSet(viewsets.ModelViewSet): # Было ReadOnlyModelViewSet
         if request.method == 'GET':
             serializer = self.get_serializer(profile)
             data = serializer.data
-            # Добавляем избранное
+            
+            # 1. Добавляем избранное
             favorites = request.user.favorites.all()
             data['favorites'] = AttractionSerializer(favorites, many=True).data
-            return Response(data)
-        
-            try:
-                bookings = request.user.bookings.all().order_by('-created_at')
-                data['bookings'] = BookingSerializer(bookings, many=True).data
-            except AttributeError:
-                # Если вы забыли добавить related_name='bookings' в models.py, сработает booking_set
-                bookings = request.user.booking_set.all().order_by('-created_at')
-                data['bookings'] = BookingSerializer(bookings, many=True).data
+            
+            # 2. Добавляем бронирования (ВОТ ЭТОТ КОД РАНЬШЕ БЫЛ НЕДОСТУПЕН)
+            # Используем related_name='bookings', который мы проверили в моделях
+            bookings = request.user.bookings.all().order_by('-created_at')
+            data['bookings'] = BookingSerializer(bookings, many=True).data
 
+            # 3. И только теперь возвращаем полный ответ
             return Response(data)
         
         elif request.method in ['PATCH', 'PUT']:
-            # Обновляем данные (partial=True разрешает обновить только одно поле, например bio)
             serializer = self.get_serializer(profile, data=request.data, partial=True)
             if serializer.is_valid():
                 serializer.save()
@@ -213,3 +214,197 @@ class BookingViewSet(viewsets.ModelViewSet):
         booking.status = 'paid'
         booking.save()
         return Response({'status': 'payment successful', 'booking_status': 'paid'})
+    
+
+# Настраиваем клиента OpenAI
+# Ключ берется из переменных окружения (os.getenv) или settings
+# 1. Настройка клиента OpenAI
+# Мы создаем "пульт управления" (client), передавая ему ключ из .env файла
+client = openai.OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+
+class AIChatViewSet(viewsets.ViewSet):
+    # 2. Права доступа
+    # AllowAny значит, что писать в чат могут даже незарегистрированные гости
+    permission_classes = [permissions.AllowAny]
+
+    # 3. Метод 'ask' (Спрашивать)
+    # Это функция, которая срабатывает, когда прилетает запрос на /api/chat/ask/
+    @action(detail=False, methods=['post'])
+    def ask(self, request):
+        # Получаем текст, который ввел пользователь (например, "Куда поехать в горы?")
+        user_query = request.data.get('message', '').strip()
+        
+        # Если прислали пустоту — сразу отвечаем заглушкой, не тратим деньги на ИИ
+        if not user_query:
+            return Response({'reply': "Спроси меня что-нибудь!", 'recommendations': []})
+
+        recommendations = [] # Сюда будем складывать карточки для фронтенда
+        context_data = ""    # А сюда — текст для "мозгов" ИИ
+
+        # --- ЭТАП 1: Поиск в твоей базе данных ---
+        # Мы ищем совпадения в базе, чтобы ИИ знал о ТВОИХ турах, а не выдумывал
+        
+        # Ищем достопримечательности (по имени, описанию, региону...)
+        attractions = Attraction.objects.filter(
+            Q(name__icontains=user_query) | 
+            Q(description__icontains=user_query) |
+            Q(region__name__icontains=user_query)
+        )[:3] # Берем только первые 3, чтобы не перегружать
+
+        # Если нашли места — добавляем их в контекст
+        if attractions.exists():
+            context_data += "Found Attractions in DB:\n"
+            for attr in attractions:
+                # Собираем данные для красивой карточки на сайте
+                img_url = request.build_absolute_uri(attr.image.url) if attr.image else ""
+                recommendations.append({
+                    'id': attr.id,
+                    'title': attr.name,
+                    'image': img_url,
+                    'type': 'attraction'
+                })
+                # Формируем текст для ИИ: "Название - Описание (первые 300 букв)"
+                desc_text = attr.description[:300] if attr.description else "No description"
+                context_data += f"- {attr.name}: {desc_text}...\n"
+
+        # (Аналогичный блок кода идет для маршрутов/Routes...)
+
+        # --- ЭТАП 2: Запрос к ИИ ---
+        
+        # Инструкция для нейросети (System Prompt)
+        # Мы говорим: "Ты гид. Используй данные из базы (context_data), чтобы ответить юзеру."
+        system_instruction = (
+            "You are a guide for TourismKZ. "
+            f"Use this DB data to answer: {context_data}"
+        )
+
+        try:
+            # Отправляем запрос в OpenAI
+            ai_response = client.chat.completions.create(
+                model="gpt-4o-mini", # Дешевая модель
+                messages=[
+                    {"role": "system", "content": system_instruction}, # Инструкция
+                    {"role": "user", "content": user_query}            # Вопрос юзера
+                ],
+                max_tokens=500 # Ограничение длины ответа
+            )
+            # Достаем текст ответа из сложной структуры JSON, которую прислал OpenAI
+            reply_text = ai_response.choices[0].message.content
+        except Exception as e:
+            # Если интернет пропал или ключ неверный — не роняем сайт, а пишем ошибку в консоль
+            print(f"Error: {e}")
+            reply_text = "Ошибка связи с ИИ."
+
+        # --- ЭТАП 3: Ответ фронтенду ---
+        # Возвращаем JSON с текстом ответа и списком найденных карточек
+        return Response({
+            'reply': reply_text,
+            'recommendations': recommendations
+        })
+
+
+
+""" class AIChatViewSet(viewsets.ViewSet):
+    permission_classes = [permissions.AllowAny]
+
+    @action(detail=False, methods=['post'])
+    def ask(self, request):
+        # 1. Получаем запрос пользователя
+        user_query = request.data.get('message', '').lower().strip()
+        
+        response_text = ""
+        recommendations = []
+
+        if not user_query:
+            return Response({'reply': "Please type something!", 'recommendations': []})
+
+        # --- ВСТАВЛЯТЬ СЮДА (НАЧАЛО) ---
+        
+        # Словарь синонимов (Маппинг намерений)
+        # Ключ = слово, которое точно есть в твоей БД (например, в Category или Region)
+        # Значение = список слов, которые может написать человек
+        keywords_map = {
+            'mountains': ['горы', 'mountain', 'hiking', 'climbing', 'peak', 'восхождение', 'хайкинг', 'альпинизм'],
+            'lakes': ['озеро', 'lake', 'water', 'swim', 'beach', 'вода', 'купаться', 'пляж', 'река'],
+            'historical': ['history', 'museum', 'monument', 'culture', 'old', 'ancient', 'история', 'музей', 'памятник'],
+            'forest': ['forest', 'trees', 'nature', 'wood', 'лес', 'природа', 'деревья'],
+            'canyon': ['canyon', 'rock', 'каньон', 'скалы', 'ущелье'],
+            'almaty': ['almaty', 'city', 'apple', 'алматы', 'город'],
+        }
+
+        # Проверяем, есть ли синоним в запросе пользователя
+        found_category = False
+        for category, synonyms in keywords_map.items():
+            if any(syn in user_query for syn in synonyms):
+                # Если нашли синоним (например "хайкинг"), меняем запрос на категорию ("mountains")
+                # Это поможет найти "Mountains" в базе, даже если слова "хайкинг" там нет
+                user_query = category 
+                found_category = True
+                break
+        
+        # --- ВСТАВЛЯТЬ СЮДА (КОНЕЦ) ---
+
+
+        # 2. Логика приветствия (если это не поиск категории)
+        greetings = ['hello', 'hi', 'привет', 'сәлем', 'hey']
+        # Если мы НЕ нашли категорию и это просто приветствие
+        if not found_category and any(word == user_query for word in greetings):
+            return Response({
+                'reply': "Hello! I am your AI Guide for Kazakhstan. Ask me about mountains, lakes, or historical places!",
+                'recommendations': []
+            })
+
+        # 3. Поиск по Достопримечательностям
+        # Теперь user_query может быть заменен на 'mountains', что точно найдется в базе
+        attractions = Attraction.objects.filter(
+            Q(name__icontains=user_query) | 
+            Q(description__icontains=user_query) |
+            Q(region__name__icontains=user_query) |
+            Q(category__name__icontains=user_query)
+        )[:3]
+
+        if attractions.exists():
+            count = attractions.count()
+            response_text += f"I found {count} place{'s' if count > 1 else ''} matching '{user_query}':\n"
+            for attr in attractions:
+                img_url = None
+                if attr.image:
+                    img_url = attr.image.url if hasattr(attr.image, 'url') else attr.image
+
+                recommendations.append({
+                    'id': attr.id,
+                    'type': 'attraction',
+                    'title': attr.name,
+                    'image': img_url,
+                    'desc': attr.category.name if attr.category else ""
+                })
+        
+        # 4. Поиск по Маршрутам
+        routes = Route.objects.filter(
+            Q(title__icontains=user_query) |
+            Q(description__icontains=user_query)
+        )[:2]
+
+        if routes.exists():
+            if response_text: 
+                response_text += "\n\nAlso, check out these tours:\n"
+            else:
+                response_text += f"I found some great tours for '{user_query}':\n"
+                
+            for route in routes:
+                recommendations.append({
+                    'id': route.id,
+                    'type': 'route',
+                    'title': route.title,
+                    'image': route.image,
+                    'desc': f"{route.duration_days} Days Tour"
+                })
+
+        # 5. Если ничего не нашли
+        if not response_text:
+            response_text = "I couldn't find anything matching that. Try searching for 'Almaty', 'National Park', or specific activities."
+
+        return Response({
+            'reply': response_text,
+            'recommendations': recommendations
+        }) """

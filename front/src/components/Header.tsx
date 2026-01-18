@@ -1,4 +1,4 @@
-import { Mountain, User, Menu, LogOut, Heart } from "lucide-react";
+import { Mountain, User, Menu, LogOut, Heart, Sparkles } from "lucide-react";
 import { Button } from "./ui/button";
 import {
   DropdownMenu,
@@ -40,6 +40,14 @@ export function Header({ isLoggedIn = false, isAdmin = false, onNavigate }: Head
           </div>
           
           <nav className="hidden md:flex items-center gap-6">
+            {/* НОВАЯ КНОПКА AI */}
+            <button 
+              onClick={() => onNavigate?.('ai-planner')} 
+              className="flex items-center gap-1 text-[#0A4B78] font-semibold bg-blue-50 px-3 py-1.5 rounded-full hover:bg-blue-100 transition-colors"
+            >
+              <Sparkles className="w-4 h-4" />
+              <span>AI Planner</span>
+            </button>
             <button onClick={() => onNavigate?.('home-user')} className="text-gray-700 hover:text-[#0A4B78]">
               {t('destinations')}
             </button>

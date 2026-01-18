@@ -4,6 +4,7 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Responsive
 import { Users, MapPin, Eye, TrendingUp } from "lucide-react";
 import { useState, useEffect } from "react";
 import axios from "axios";
+import { useTranslation } from "react-i18next";
 
 interface AdminDashboardProps {
   onNavigate: (page: string) => void;
@@ -13,6 +14,7 @@ export function AdminDashboard({ onNavigate }: AdminDashboardProps) {
   const [stats, setStats] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const token = localStorage.getItem('access_token');
+  const { t } = useTranslation();
 
   useEffect(() => {
     const fetchStats = async () => {
@@ -30,7 +32,7 @@ export function AdminDashboard({ onNavigate }: AdminDashboardProps) {
     fetchStats();
   }, [token]);
 
-  if (loading) return <div className="p-8">Loading dashboard...</div>;
+  if (loading) return <div className="p-8">{t("Loading dashboard...")}</div>;
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -38,15 +40,15 @@ export function AdminDashboard({ onNavigate }: AdminDashboardProps) {
       
       <main className="container mx-auto px-4 py-8">
         <div className="mb-8">
-          <h1 className="mb-2">Admin Dashboard</h1>
-          <p className="text-gray-600">Overview of Tourism Kazakhstan platform analytics</p>
+          <h1 className="mb-2">{t("Admin Dashboard")}</h1>
+          <p className="text-gray-600">{t("Overview of Tourism Kazakhstan platform analytics")}</p>
         </div>
 
         {/* Stats Cards */}
         <div className="grid md:grid-cols-4 gap-6 mb-8">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm">Total Users</CardTitle>
+              <CardTitle className="text-sm">{t("Total Users")}</CardTitle>
               <Users className="w-4 h-4 text-gray-500" />
             </CardHeader>
             <CardContent>
@@ -56,7 +58,7 @@ export function AdminDashboard({ onNavigate }: AdminDashboardProps) {
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm">Total Attractions</CardTitle>
+              <CardTitle className="text-sm">{t("Total Attractions")}</CardTitle>
               <MapPin className="w-4 h-4 text-gray-500" />
             </CardHeader>
             <CardContent>
@@ -66,7 +68,7 @@ export function AdminDashboard({ onNavigate }: AdminDashboardProps) {
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm">Page Views</CardTitle>
+              <CardTitle className="text-sm">{t("Page Views")}</CardTitle>
               <Eye className="w-4 h-4 text-gray-500" />
             </CardHeader>
             <CardContent>
@@ -76,7 +78,7 @@ export function AdminDashboard({ onNavigate }: AdminDashboardProps) {
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm">Pending Reviews</CardTitle>
+              <CardTitle className="text-sm">{t("Pending Reviews")}</CardTitle>
               <TrendingUp className="w-4 h-4 text-gray-500" />
             </CardHeader>
             <CardContent>
@@ -88,7 +90,7 @@ export function AdminDashboard({ onNavigate }: AdminDashboardProps) {
         {/* Popular Destinations Chart */}
         <Card className="mb-6">
           <CardHeader>
-            <CardTitle>Most Popular Destinations (by Visitors)</CardTitle>
+            <CardTitle>{t("Most Popular Destinations (by Visitors)")}</CardTitle>
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={300}>
@@ -112,8 +114,8 @@ export function AdminDashboard({ onNavigate }: AdminDashboardProps) {
           >
             <CardContent className="pt-6 text-center">
               <MapPin className="w-12 h-12 mx-auto mb-3 text-[#0A4B78]" />
-              <h3 className="mb-2">Manage Attractions</h3>
-              <p className="text-sm text-gray-600">Add, edit, or remove destinations</p>
+              <h3 className="mb-2">{t("Manage Attractions")}</h3>
+              <p className="text-sm text-gray-600">{t("Add, edit, or remove destinations")}</p>
             </CardContent>
           </Card>
 
@@ -123,8 +125,8 @@ export function AdminDashboard({ onNavigate }: AdminDashboardProps) {
           >
             <CardContent className="pt-6 text-center">
               <TrendingUp className="w-12 h-12 mx-auto mb-3 text-[#0A4B78]" />
-              <h3 className="mb-2">Moderate Reviews</h3>
-              <p className="text-sm text-gray-600">Approve or deny user reviews</p>
+              <h3 className="mb-2">{t("Moderate Reviews")}</h3>
+              <p className="text-sm text-gray-600">{t("Approve or deny user reviews")}</p>
             </CardContent>
           </Card>
           <Card 
@@ -133,8 +135,8 @@ export function AdminDashboard({ onNavigate }: AdminDashboardProps) {
           >
             <CardContent className="pt-6 text-center">
               <MapPin className="w-12 h-12 mx-auto mb-3 text-[#0A4B78]" />
-              <h3 className="mb-2">Manage Routes</h3>
-              <p className="text-sm text-gray-600">Create tours and add stops</p>
+              <h3 className="mb-2">{t("Manage Routes")}</h3>
+              <p className="text-sm text-gray-600">{t("Create tours and add stops")}</p>
             </CardContent>
           </Card>
         </div>

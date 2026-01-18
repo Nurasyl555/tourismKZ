@@ -1,14 +1,15 @@
 import { Header } from "../Header";
 import { Button } from "../ui/button";
 import { ImageWithFallback } from "../figma/ImageWithFallback";
-import { useTranslation } from 'react-i18next'; // 1. Импорт хука
+import { useTranslation } from 'react-i18next';
+import { TypeAnimation } from 'react-type-animation'; // 1. Импортируем библиотеку
 
 interface HomePageGuestProps {
   onNavigate: (page: string) => void;
 }
 
 export function HomePageGuest({ onNavigate }: HomePageGuestProps) {
-  const { t } = useTranslation(); // 2. Инициализация
+  const { t } = useTranslation();
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -25,8 +26,24 @@ export function HomePageGuest({ onNavigate }: HomePageGuestProps) {
           <div className="absolute inset-0 bg-black/40" />
           
           <div className="relative z-10 text-center text-white max-w-4xl px-4">
-            {/* Используем новые ключи для заголовков */}
-            <h1 className="mb-6 text-white">{t('guest_hero_title')}</h1>
+            
+            {/* 2. ЗАМЕНИЛИ ОБЫЧНЫЙ H1 НА АНИМАЦИЮ */}
+            <div className="mb-6 text-white text-4xl md:text-5xl font-bold min-h-[60px]">
+                <TypeAnimation
+                  sequence={[
+                    t('guest_hero_title'), // Сначала печатает ваш основной заголовок
+                    2000,                  // Ждет 2 секунды
+                    t('guest_hero_title_2'),      // Печатает второй текст (можете заменить на t('key'))
+                    2000,
+                    t('guest_hero_title_3'),      // Печатает третий текст
+                    2000
+                  ]}
+                  wrapper="h1" // Оборачиваем это всё в тег h1
+                  speed={50}
+                  repeat={Infinity}
+                />
+            </div>
+
             <p className="text-xl mb-8 text-white">
               {t('guest_hero_subtitle')}
             </p>
